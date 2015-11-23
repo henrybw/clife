@@ -1,32 +1,21 @@
-# Object files
+# where the binaries live
+bin/
+
+# object files and stuff
 *.o
-*.ko
-*.obj
-*.elf
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Libraries
-*.lib
 *.a
-*.la
-*.lo
 
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
+# vim swap files
+.sw*
+.*.sw*
+*~
 
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
+# tags
+ctags
+tags
+TAGS
+cscope.files
+cscope.out
 
-# Debug files
-*.dSYM/
+# other crap
+.fuse*
