@@ -37,6 +37,8 @@ typedef struct universe {
     uint32_t width;
     uint32_t height;
     cell *cells;
+    cell_pool *changed;
+    cell_pool *dirty;  // Used during evolution; stays empty most of the time
     size_t generation;
 } universe;
 

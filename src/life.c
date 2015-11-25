@@ -54,6 +54,10 @@ universe *universe_create(uint64_t width, uint64_t height, bool seed[])
     univ->height = height;
     univ->cells = calloc(sizeof(cell), width * height);
 
+    // At most, every cell could be in these pools
+    univ->dirty = cell_pool_create(width * height);
+    univ->changed = cell_pool_create(width * height);
+
     universe_foreach_pos(univ, x, y) {
         cell *cur_cell = universe_cell_at(univ, x, y);
         cur_cell->x = x;
@@ -63,6 +67,7 @@ universe *universe_create(uint64_t width, uint64_t height, bool seed[])
         universe_foreach_neighbor(univ, cur_cell, neighbor_x, neighbor_y) {
             if (seed[neighbor_y * width + neighbor_x]) {
                 cur_cell->live_neighbors++;
+                cell_pool_push(univ->changed, cur_cell);
             }
         }
     }
@@ -82,10 +87,37 @@ cell *universe_cell_at(universe *univ, uint32_t x, uint32_t y)
 void universe_evolve(universe *univ)
 {
     univ->generation++;
+
+    // Update cells based on the previous generation's dirty pool
+    cell_pool_foreach(univ->changed, cur_cell) {
+        bool next_state = cell_next_state(cur_cell);
+        if (cur_cell->alive != next_state) {
+            cur_cell->alive = next_state;
+            cell_pool_push(univ->dirty, cur_cell);
+        }
+        cur_cell->age = (cur_cell->alive) ? cur_cell->age + 1 : 0;
+    }
+
+    // Update the live neighbor counts once everything has settled
+    cell_pool_foreach(univ->dirty, cur_cell) {
+        cur_cell->live_neighbors = 0;
+        universe_foreach_neighbor_cell(univ, cur_cell, neighbor_cell) {
+            if (neighbor_cell->alive) {
+                cur_cell->live_neighbors++;
+            }
+        }
+    }
+
+    cell_pool *tmp = univ->changed;
+    univ->changed = univ->dirty;
+    univ->dirty = tmp;
+    cell_pool_clear(univ->dirty);
 }
 
 void universe_destroy(universe *univ)
 {
+    cell_pool_destroy(univ->dirty);
+    cell_pool_destroy(univ->changed);
     free(univ->cells);
     free(univ);
 }
