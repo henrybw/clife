@@ -44,6 +44,8 @@ typedef struct universe {
 
 universe *universe_create(uint64_t width, uint64_t height, bool *seed);
 cell *universe_cell_at(universe *univ, uint32_t x, uint32_t y);
+void universe_print(universe *univ);
+void universe_print_verbose(universe *univ);
 void universe_evolve(universe *univ);
 void universe_destroy(universe *univ);
 

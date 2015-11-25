@@ -1,6 +1,7 @@
 #include "life.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 
 bool cell_next_state(cell *self)
 {
@@ -81,6 +82,45 @@ cell *universe_cell_at(universe *univ, uint32_t x, uint32_t y)
        return &univ->cells[y * univ->width + x];
     } else {
        return NULL;
+    }
+}
+
+void universe_print(universe *univ)
+{
+    printf("+");
+    for (int i = 0; i < univ->width * 3 + 2; i++) {
+        printf("-");
+    }
+    printf("+\n");
+    universe_foreach_pos(univ, x, y) {
+        if (x == 0) {
+            printf("|");
+        }
+        cell *cur_cell = universe_cell_at(univ, x, y);
+        printf("%3zu", cur_cell->age);
+        if (x + 1 == univ->width) {
+            printf("  |\n");
+        }
+    }
+    printf("+");
+    for (int i = 0; i < univ->width * 3 + 2; i++) {
+        printf("-");
+    }
+    printf("+\n");
+}
+
+void universe_print_verbose(universe *univ)
+{
+    universe_foreach_cell(univ, cur_cell) {
+        printf("cell (%d, %d) is %s and has %zu live neighbors\n",
+               cur_cell->x, cur_cell->y,
+               cur_cell->alive ? "alive" : "dead",
+               cur_cell->live_neighbors);
+        universe_foreach_neighbor_cell(univ, cur_cell, neighbor_cell) {
+            printf("\tneighbor at (%d, %d) is %s\n",
+                   neighbor_cell->x, neighbor_cell->y,
+                   neighbor_cell->alive ? "alive" : "dead");
+        }
     }
 }
 
