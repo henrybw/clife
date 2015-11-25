@@ -11,6 +11,42 @@ bool cell_next_state(cell *self)
     }
 }
 
+cell_pool *cell_pool_create(size_t capacity)
+{
+    cell_pool *pool = calloc(sizeof(cell_pool), 1);
+    pool->cells = calloc(sizeof(cell *), capacity);
+    pool->capacity = capacity;
+    return pool;
+}
+
+cell *cell_pool_get(cell_pool *pool, size_t idx)
+{
+    return (idx < pool->count) ? pool->cells[idx] : NULL;
+}
+
+void cell_pool_push(cell_pool *pool, cell *new_cell)
+{
+    if (pool->count == pool->capacity) {
+        return;  // XXX HBW - silently failing will suffice, but isn't ideal
+    }
+    pool->cells[pool->count] = new_cell;
+    pool->count++;
+}
+
+void cell_pool_clear(cell_pool *pool)
+{
+    // Doesn't actually free anything
+    pool->count = 0;
+}
+
+void cell_pool_destroy(cell_pool *pool)
+{
+    // We didn't allocate any of the cells stored in here, which means we don't
+    // need to free the cells individually here either.
+    free(pool->cells);
+    free(pool);
+}
+
 universe *universe_create(uint64_t width, uint64_t height, bool seed[])
 {
     universe *univ = calloc(sizeof(universe), 1);  // Zero-initializes

@@ -15,6 +15,24 @@ typedef struct cell {
 
 bool cell_next_state(cell *self);
 
+typedef struct cell_pool {
+    cell **cells;
+    size_t count;
+    size_t capacity;
+} cell_pool;
+
+cell_pool *cell_pool_create(size_t capacity);
+cell *cell_pool_get(cell_pool *pool, size_t idx);
+void cell_pool_push(cell_pool *pool, cell *new_cell);
+void cell_pool_clear(cell_pool *pool);
+void cell_pool_destroy(cell_pool *pool);
+
+#define cell_pool_foreach(pool, _cell_iter)                                     \
+    for (size_t __pool_i = 0; __pool_i < (pool)->count; __pool_i++)             \
+        for (cell *_cell_iter = cell_pool_get((pool), __pool_i);                \
+             _cell_iter;                                                        \
+             _cell_iter = NULL)
+
 typedef struct universe {
     uint32_t width;
     uint32_t height;
