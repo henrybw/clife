@@ -2,6 +2,7 @@
 
 #include <SDL.h>
 #include <stdio.h>
+#include <unistd.h>
 
 int main()
 {
@@ -20,18 +21,10 @@ int main()
     };
     universe *univ = universe_create(10, 10, seed);
 
-    // TODO HBW - actually do something here instead of just dumping the
-    // state of the universe...
-    universe_foreach_cell(univ, cur_cell) {
-        printf("cell (%d, %d) is %s and has %zu live neighbors\n",
-               cur_cell->x, cur_cell->y,
-               cur_cell->alive ? "alive" : "dead",
-               cur_cell->live_neighbors);
-        universe_foreach_neighbor_cell(univ, cur_cell, neighbor_cell) {
-            printf("\tneighbor at (%d, %d) is %s\n",
-                   neighbor_cell->x, neighbor_cell->y,
-                   neighbor_cell->alive ? "alive" : "dead");
-        }
+    for (int i = 0; i < 10; i++) {
+        universe_print(univ);
+        universe_evolve(univ);
+        sleep(1);
     }
 
     universe_destroy(univ);
