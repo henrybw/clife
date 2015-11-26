@@ -11,6 +11,8 @@ typedef struct cell {
     size_t age;  // 0 for dead cells, 1 or higher for live cells
     size_t live_neighbors;
     bool alive;
+    bool next_state;
+    bool dirty;  // XXX HBW - we really don't need this
 } cell;
 
 bool cell_next_state(cell *self);
