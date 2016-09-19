@@ -1,7 +1,7 @@
-#include "life.h"
-
 #include <stdlib.h>
 #include <stdio.h>
+
+#include "life.h"
 
 bool cell_next_state(cell *self)
 {
