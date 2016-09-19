@@ -1,5 +1,5 @@
-#ifndef _LIFE_H
-#define _LIFE_H
+#ifndef LIFE_H
+#define LIFE_H
 
 #include <stdbool.h>
 #include <stdint.h>
