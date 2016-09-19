@@ -34,7 +34,7 @@ distclean:
 
 tags:
 	cd $(SRCDIR)
-	ctags -R --exclude=Makefile --exclude=bin/*
+	ctags -eR --exclude=Makefile --exclude=bin/*
 	find . \( -name "*.c" -o -name "*.h" \) > cscope.files; cscope -b
 	cd ..
 
