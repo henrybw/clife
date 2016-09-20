@@ -64,14 +64,6 @@ int main()
     bail_on_error(SDL_Init(SDL_INIT_EVERYTHING));
     atexit(SDL_Quit);
 
-    // Seed the universe with a glider
-    bool seed[WIDTH * HEIGHT] = { 0 };
-    seed[1 * WIDTH + 2] = true;
-    seed[2 * WIDTH + 3] = true;
-    seed[3 * WIDTH + 1] = true;
-    seed[3 * WIDTH + 2] = true;
-    seed[3 * WIDTH + 3] = true;
-
     SDL_Window *win =
         bail_on_null(SDL_CreateWindow("Game of Life", 15, 15,
                                       WIDTH * PIXEL_SIZE, HEIGHT * PIXEL_SIZE,
@@ -81,6 +73,13 @@ int main()
                                         SDL_RENDERER_ACCELERATED |
                                         SDL_RENDERER_PRESENTVSYNC |
                                         SDL_RENDERER_TARGETTEXTURE));
+
+    bool seed[WIDTH * HEIGHT] = { 0 };
+    seed[1 * WIDTH + 2] = true;
+    seed[2 * WIDTH + 3] = true;
+    seed[3 * WIDTH + 1] = true;
+    seed[3 * WIDTH + 2] = true;
+    seed[3 * WIDTH + 3] = true;
     universe *univ = universe_create(WIDTH, HEIGHT, seed);
     bool done = false;
 
