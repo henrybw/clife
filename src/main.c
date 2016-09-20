@@ -7,27 +7,6 @@
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
-#define bail_on_error(expr)                                                     \
-    ({                                                                          \
-        int __result = (expr);                                                  \
-        if (__result != 0) {                                                    \
-            fprintf(stderr, #expr " failed with return code %d\n", __result);   \
-            exit(1);                                                            \
-        }                                                                       \
-    })
-
-#define bail_on_null(expr)                                                      \
-    ({                                                                          \
-        void *__result = (expr);                                                \
-        if (!__result) {                                                        \
-            fprintf(stderr, #expr " returned NULL; SDL_Error says %s\n",        \
-                    SDL_GetError());                                            \
-            SDL_Quit();                                                         \
-            exit(1);                                                            \
-        }                                                                       \
-        __result;                                                               \
-    })
-
 static const size_t WIDTH = 128;
 static const size_t HEIGHT = 98;
 static const uint8_t PIXEL_SIZE = 8;
@@ -61,18 +40,33 @@ void universe_render(universe *univ, SDL_Renderer *rend)
 
 int main()
 {
-    bail_on_error(SDL_Init(SDL_INIT_EVERYTHING));
-    atexit(SDL_Quit);
+    int status = EXIT_SUCCESS;
+    int rc;
+    if ((rc = SDL_Init(SDL_INIT_EVERYTHING)) != 0) {
+        fprintf(stderr, "SDL_Init failed with return code %d\n", rc);
+        status = EXIT_FAILURE;
+        goto sdl_failed;
+    }
 
-    SDL_Window *win =
-        bail_on_null(SDL_CreateWindow("Game of Life", 15, 15,
-                                      WIDTH * PIXEL_SIZE, HEIGHT * PIXEL_SIZE,
-                                      SDL_WINDOW_SHOWN));
-    SDL_Renderer *rend =
-        bail_on_null(SDL_CreateRenderer(win, -1,
-                                        SDL_RENDERER_ACCELERATED |
-                                        SDL_RENDERER_PRESENTVSYNC |
-                                        SDL_RENDERER_TARGETTEXTURE));
+    SDL_Window *win = SDL_CreateWindow("Game of Life", 15, 15,
+                                       WIDTH * PIXEL_SIZE, HEIGHT * PIXEL_SIZE,
+                                       SDL_WINDOW_SHOWN);
+    if (!win) {
+        fprintf(stderr, "SDL_CreateWindow failed with error %s\n", SDL_GetError());
+        status = EXIT_FAILURE;
+        goto window_failed;
+    }
+
+    SDL_Renderer *rend = SDL_CreateRenderer(win, -1,
+                                            SDL_RENDERER_ACCELERATED |
+                                            SDL_RENDERER_PRESENTVSYNC |
+                                            SDL_RENDERER_TARGETTEXTURE);
+    if (!rend) {
+        fprintf(stderr, "SDL_CreateRenderer failed with error %s\n",
+                SDL_GetError());
+        status = EXIT_FAILURE;
+        goto renderer_failed;
+    }
 
     bool seed[WIDTH * HEIGHT] = { 0 };
     seed[1 * WIDTH + 2] = true;
@@ -116,7 +110,10 @@ int main()
 
     universe_destroy(univ);
     SDL_DestroyRenderer(rend);
+renderer_failed:
     SDL_DestroyWindow(win);
+window_failed:
     SDL_Quit();
-    return 0;
+sdl_failed:
+    return status;
 }
