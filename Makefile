@@ -1,5 +1,5 @@
 CC=clang
-CFLAGS=-Wall -Werror -pedantic -Wno-gnu $(shell sdl2-config --cflags)
+CFLAGS=-Wall -Werror -Wno-unused-const-variable -pedantic -Wno-gnu $(shell sdl2-config --cflags)
 LFLAGS=$(shell sdl2-config --libs)
 
 SRCDIR=src
